@@ -62,7 +62,7 @@ def main():
     if mode == "Percentage":
         metric = PERCENT
         hover = [WOMEN_2024, SEATS]
-        colors = dict(color_continuous_scale="Purples", range_color=(0, 100))
+        colors = {"color_continuous_scale": "Purples", "range_color": (0, 100)}
         st.metric(
             "National Percentage in 2026",
             f"{states[WOMEN_2026].sum() / states[SEATS].sum():.1%}",
@@ -73,10 +73,10 @@ def main():
         metric = CHANGE
         hover = [WOMEN_2024, WOMEN_2026]
         limit = max(1, int(states[CHANGE].abs().max()))
-        colors = dict(
-            color_continuous_scale=["#b2182b", "#f7f7f7", "#542788"],
-            range_color=(-limit, limit),
-        )
+        colors = {
+            "color_continuous_scale": ["#b2182b", "#f7f7f7", "#542788"],
+            "range_color": (-limit, limit),
+        }
         st.metric("National Change between 2024 and 2026", f"{states[CHANGE].sum():+d}")
         st.caption(
             "Women in 2026 minus women in 2024. A positive value indicates an increase."
