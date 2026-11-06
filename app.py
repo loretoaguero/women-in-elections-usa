@@ -11,10 +11,11 @@ WOMEN_2026 = "Women in 2026"
 SEATS = "Seats in 2024"
 PERCENT = "Women in 2026 (%)"
 CHANGE = "Difference (2026 − 2024)"
+PARTIES = {"All": None, "Democratic": "D", "Republican": "R"}
 
 
 @st.cache_data
-def load_data():
+def load_data(party=None):
     results = pd.read_csv(
         DATA / "1976-2024-house.tab",
         usecols=["year", "state_po", "district"],
@@ -42,6 +43,8 @@ def load_data():
 
     states = seats.to_frame()
     for label, rows in [(WOMEN_2024, women_2024), (WOMEN_2026, women_2026)]:
+        if party is not None:
+            rows = rows.loc[rows["Party"].eq(party)]
         counts = rows.drop_duplicates(keys).groupby("State").size()
         states[label] = counts.reindex(states.index, fill_value=0)
 
@@ -57,17 +60,21 @@ def main():
     )
     st.title("Women in the U.S. House of Representatives")
     mode = st.radio("View", ["Percentage", "Absolute Difference"], horizontal=True)
-    states = load_data()
+    party = st.selectbox("Party", list(PARTIES), index=0)
+    states = load_data(PARTIES[party])
 
     if mode == "Percentage":
         metric = PERCENT
-        hover = [WOMEN_2024, SEATS]
+        hover = [WOMEN_2026, SEATS]
         colors = {"color_continuous_scale": "Purples", "range_color": (0, 100)}
         st.metric(
             "National Percentage in 2026",
             f"{states[WOMEN_2026].sum() / states[SEATS].sum():.1%}",
         )
-        st.caption("Percentage of seats won by women in 2026, by state.")
+        st.caption(
+            "Share of all House seats in each state won by women from the selected "
+            "party in 2026. All includes women from every party."
+        )
         number_format = "%.1f %%"
     else:
         metric = CHANGE
@@ -79,7 +86,8 @@ def main():
         }
         st.metric("National Change between 2024 and 2026", f"{states[CHANGE].sum():+d}")
         st.caption(
-            "Women in 2026 minus women in 2024. A positive value indicates an increase."
+            "Women in 2026 minus women in 2024 for the selected party. "
+            "A positive value indicates an increase."
         )
         number_format = "%+d"
 
@@ -97,7 +105,7 @@ def main():
         },
         **colors,
     )
-    fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
+    fig.update_layout(margin={"l": 0, "r": 0, "t": 0, "b": 0})
     st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
     st.dataframe(
         states[[STATE, *hover, metric]].sort_values(metric, ascending=False),
