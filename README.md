@@ -9,12 +9,23 @@ The analysis uses Python, pandas, and Plotly. Data cleaning, comparisons, and ma
 ## Project files
 
 - [`notebooks/EDA.ipynb`](notebooks/EDA.ipynb): main analysis notebook.
+- [`app.py`](app.py): Streamlit dashboard for the two state maps.
 - `data/`: local datasets and exports.
 - `notebooks/*.png`: exploratory maps.
 
 ## Getting started
 
 Requires Python 3.14+ and [uv](https://docs.astral.sh/uv/).
+
+Run the dashboard locally:
+
+```bash
+uv run streamlit run app.py
+```
+
+The single view selector switches between the share of House seats won by women in 2024 and the change in the number of women from 2024 to 2026 (2026 minus 2024). The map and state table use the local datasets in `data/`.
+
+To open the notebook:
 
 ```bash
 uv sync --dev
